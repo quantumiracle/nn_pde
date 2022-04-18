@@ -1,0 +1,114 @@
+/home/zihan/anaconda3/envs/x/lib/python3.7/site-packages/torch/nn/functional.py:1933: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+It: 0, Loss: 4.466e+03, l1: 0.004, l2: -0.00999, Time: 0.08
+It: 100, Loss: 1.267e+03, l1: 0.070, l2: 0.00395, Time: 6.24
+It: 200, Loss: 8.250e+02, l1: 0.041, l2: -0.01117, Time: 6.19
+It: 300, Loss: 7.644e+02, l1: 0.040, l2: -0.00710, Time: 6.14
+It: 400, Loss: 7.075e+02, l1: 0.035, l2: -0.00093, Time: 6.00
+It: 500, Loss: 6.594e+02, l1: 0.033, l2: -0.00155, Time: 6.24
+It: 600, Loss: 6.230e+02, l1: 0.027, l2: 0.00094, Time: 6.56
+It: 700, Loss: 5.934e+02, l1: 0.023, l2: 0.00144, Time: 6.27
+It: 800, Loss: 5.656e+02, l1: 0.014, l2: -0.00049, Time: 6.22
+It: 900, Loss: 5.424e+02, l1: 0.013, l2: -0.00016, Time: 6.72
+It: 1000, Loss: 5.224e+02, l1: 0.024, l2: 0.00133, Time: 6.13
+It: 1100, Loss: 4.934e+02, l1: 0.228, l2: 0.00723, Time: 6.19
+It: 1200, Loss: 4.673e+02, l1: 0.513, l2: 0.01662, Time: 6.26
+It: 1300, Loss: 4.493e+02, l1: 0.633, l2: 0.01958, Time: 7.08
+It: 1400, Loss: 4.215e+02, l1: 0.714, l2: 0.02171, Time: 6.65
+It: 1500, Loss: 3.721e+02, l1: 0.786, l2: 0.02245, Time: 6.81
+It: 1600, Loss: 3.461e+02, l1: 0.796, l2: 0.02238, Time: 6.29
+It: 1700, Loss: 3.268e+02, l1: 0.797, l2: 0.02224, Time: 6.10
+It: 1800, Loss: 2.783e+02, l1: 0.798, l2: 0.02192, Time: 5.79
+It: 1900, Loss: 2.086e+02, l1: 0.794, l2: 0.02027, Time: 7.60
+It: 2000, Loss: 1.788e+02, l1: 0.796, l2: 0.01767, Time: 5.84
+It: 2100, Loss: 1.658e+02, l1: 0.801, l2: 0.01595, Time: 5.56
+It: 2200, Loss: 1.562e+02, l1: 0.807, l2: 0.01536, Time: 5.96
+It: 2300, Loss: 1.462e+02, l1: 0.814, l2: 0.01444, Time: 6.23
+It: 2400, Loss: 1.375e+02, l1: 0.817, l2: 0.01339, Time: 5.73
+It: 2500, Loss: 1.308e+02, l1: 0.822, l2: 0.01285, Time: 5.72
+It: 2600, Loss: 1.260e+02, l1: 0.827, l2: 0.01170, Time: 5.53
+It: 2700, Loss: 1.221e+02, l1: 0.831, l2: 0.01167, Time: 6.16
+It: 2800, Loss: 1.186e+02, l1: 0.835, l2: 0.01133, Time: 5.83
+It: 2900, Loss: 1.152e+02, l1: 0.841, l2: 0.01081, Time: 5.68
+It: 3000, Loss: 1.117e+02, l1: 0.845, l2: 0.01103, Time: 5.72
+It: 3100, Loss: 1.092e+02, l1: 0.849, l2: 0.01021, Time: 5.61
+It: 3200, Loss: 1.069e+02, l1: 0.851, l2: 0.01066, Time: 5.74
+It: 3300, Loss: 1.048e+02, l1: 0.853, l2: 0.01081, Time: 5.84
+It: 3400, Loss: 1.026e+02, l1: 0.855, l2: 0.01096, Time: 5.68
+It: 3500, Loss: 1.003e+02, l1: 0.857, l2: 0.01026, Time: 5.93
+It: 3600, Loss: 9.779e+01, l1: 0.859, l2: 0.01064, Time: 5.75
+It: 3700, Loss: 9.536e+01, l1: 0.861, l2: 0.01125, Time: 5.83
+It: 3800, Loss: 9.327e+01, l1: 0.863, l2: 0.01073, Time: 5.82
+It: 3900, Loss: 9.159e+01, l1: 0.865, l2: 0.01106, Time: 5.62
+It: 4000, Loss: 9.031e+01, l1: 0.865, l2: 0.01213, Time: 7.74
+It: 4100, Loss: 8.924e+01, l1: 0.867, l2: 0.01126, Time: 5.65
+It: 4200, Loss: 8.836e+01, l1: 0.868, l2: 0.01130, Time: 8.32
+It: 4300, Loss: 8.757e+01, l1: 0.868, l2: 0.01128, Time: 6.25
+It: 4400, Loss: 8.683e+01, l1: 0.869, l2: 0.01132, Time: 5.63
+It: 4500, Loss: 8.615e+01, l1: 0.870, l2: 0.01141, Time: 5.77
+It: 4600, Loss: 8.550e+01, l1: 0.870, l2: 0.01159, Time: 5.72
+It: 4700, Loss: 8.487e+01, l1: 0.871, l2: 0.01146, Time: 5.50
+It: 4800, Loss: 8.428e+01, l1: 0.871, l2: 0.01155, Time: 5.71
+It: 4900, Loss: 8.374e+01, l1: 0.871, l2: 0.01181, Time: 5.67
+It: 5000, Loss: 8.324e+01, l1: 0.872, l2: 0.01168, Time: 5.56
+It: 5100, Loss: 8.279e+01, l1: 0.872, l2: 0.01174, Time: 5.66
+It: 5200, Loss: 8.235e+01, l1: 0.873, l2: 0.01177, Time: 5.53
+It: 5300, Loss: 8.192e+01, l1: 0.874, l2: 0.01182, Time: 5.49
+It: 5400, Loss: 8.151e+01, l1: 0.874, l2: 0.01183, Time: 5.64
+It: 5500, Loss: 8.112e+01, l1: 0.875, l2: 0.01186, Time: 5.50
+It: 5600, Loss: 8.072e+01, l1: 0.875, l2: 0.01190, Time: 5.49
+It: 5700, Loss: 8.031e+01, l1: 0.876, l2: 0.01188, Time: 5.51
+It: 5800, Loss: 7.987e+01, l1: 0.877, l2: 0.01194, Time: 5.52
+It: 5900, Loss: 7.938e+01, l1: 0.878, l2: 0.01214, Time: 5.53
+It: 6000, Loss: 7.882e+01, l1: 0.878, l2: 0.01208, Time: 5.53
+It: 6100, Loss: 7.826e+01, l1: 0.880, l2: 0.01174, Time: 5.51
+It: 6200, Loss: 7.774e+01, l1: 0.880, l2: 0.01289, Time: 5.51
+It: 6300, Loss: 7.721e+01, l1: 0.880, l2: 0.01262, Time: 5.52
+It: 6400, Loss: 7.680e+01, l1: 0.882, l2: 0.01248, Time: 5.45
+It: 6500, Loss: 7.641e+01, l1: 0.882, l2: 0.01237, Time: 5.52
+It: 6600, Loss: 7.609e+01, l1: 0.883, l2: 0.01237, Time: 5.50
+It: 6700, Loss: 7.581e+01, l1: 0.884, l2: 0.01239, Time: 5.52
+It: 6800, Loss: 7.555e+01, l1: 0.884, l2: 0.01229, Time: 5.49
+It: 6900, Loss: 7.534e+01, l1: 0.884, l2: 0.01276, Time: 5.46
+It: 7000, Loss: 7.510e+01, l1: 0.884, l2: 0.01225, Time: 5.50
+It: 7100, Loss: 7.489e+01, l1: 0.885, l2: 0.01248, Time: 5.48
+It: 7200, Loss: 7.468e+01, l1: 0.885, l2: 0.01244, Time: 5.51
+It: 7300, Loss: 7.448e+01, l1: 0.885, l2: 0.01239, Time: 5.60
+It: 7400, Loss: 7.430e+01, l1: 0.885, l2: 0.01287, Time: 5.55
+It: 7500, Loss: 7.414e+01, l1: 0.885, l2: 0.01261, Time: 5.44
+It: 7600, Loss: 7.389e+01, l1: 0.885, l2: 0.01270, Time: 5.55
+It: 7700, Loss: 7.369e+01, l1: 0.886, l2: 0.01276, Time: 5.50
+It: 7800, Loss: 7.349e+01, l1: 0.886, l2: 0.01272, Time: 5.46
+It: 7900, Loss: 7.349e+01, l1: 0.886, l2: 0.01292, Time: 5.54
+It: 8000, Loss: 7.315e+01, l1: 0.888, l2: 0.01194, Time: 5.54
+It: 8100, Loss: 7.296e+01, l1: 0.887, l2: 0.01272, Time: 5.51
+It: 8200, Loss: 7.282e+01, l1: 0.887, l2: 0.01269, Time: 5.48
+It: 8300, Loss: 7.268e+01, l1: 0.888, l2: 0.01261, Time: 5.46
+It: 8400, Loss: 7.255e+01, l1: 0.888, l2: 0.01279, Time: 5.49
+It: 8500, Loss: 7.248e+01, l1: 0.888, l2: 0.01278, Time: 5.47
+It: 8600, Loss: 7.235e+01, l1: 0.888, l2: 0.01316, Time: 5.56
+It: 8700, Loss: 7.221e+01, l1: 0.888, l2: 0.01253, Time: 5.52
+It: 8800, Loss: 7.208e+01, l1: 0.888, l2: 0.01257, Time: 5.47
+It: 8900, Loss: 7.201e+01, l1: 0.888, l2: 0.01313, Time: 5.89
+It: 9000, Loss: 7.185e+01, l1: 0.888, l2: 0.01270, Time: 4.64
+It: 9100, Loss: 7.173e+01, l1: 0.888, l2: 0.01271, Time: 5.69
+It: 9200, Loss: 7.162e+01, l1: 0.888, l2: 0.01278, Time: 5.63
+It: 9300, Loss: 7.150e+01, l1: 0.889, l2: 0.01276, Time: 5.73
+It: 9400, Loss: 7.139e+01, l1: 0.889, l2: 0.01268, Time: 5.61
+It: 9500, Loss: 7.130e+01, l1: 0.890, l2: 0.01218, Time: 5.46
+It: 9600, Loss: 7.117e+01, l1: 0.890, l2: 0.01206, Time: 5.51
+It: 9700, Loss: 7.101e+01, l1: 0.890, l2: 0.01254, Time: 6.13
+It: 9800, Loss: 7.087e+01, l1: 0.890, l2: 0.01255, Time: 5.50
+It: 9900, Loss: 7.073e+01, l1: 0.890, l2: 0.01270, Time: 5.55
+Traceback (most recent call last):
+  File "train.py", line 310, in <module>
+    train(pinn, nIter, xyt_test, u_test, v_test, p_test)
+  File "train.py", line 264, in train
+    pinn.scheduler.step()
+  File "/home/zihan/anaconda3/envs/x/lib/python3.7/site-packages/torch/optim/lr_scheduler.py", line 154, in step
+    values = self.get_lr()
+  File "/home/zihan/anaconda3/envs/x/lib/python3.7/site-packages/torch/optim/lr_scheduler.py", line 331, in get_lr
+    for lmbda, group in zip(self.lr_lambdas, self.optimizer.param_groups)]
+  File "/home/zihan/anaconda3/envs/x/lib/python3.7/site-packages/torch/optim/lr_scheduler.py", line 331, in <listcomp>
+    for lmbda, group in zip(self.lr_lambdas, self.optimizer.param_groups)]
+TypeError: 'float' object is not callable
