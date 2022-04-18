@@ -27,8 +27,8 @@ from torch.autograd import backward
 import torch.nn.functional as F
 
 
-# device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-device = 'cpu'
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+#device = 'cpu'
 
 class PhysicsInformedNN(nn.Module):
     def __init__(self, xyt, u, v, layers, optim_method, lr): # xyt.size()=(N*T,3), Xbatch=N*T
