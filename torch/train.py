@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
     nIter = 200000  # original niter is 200000
 
-    lr = 0.001
+    lr = 0.01
 
     optim_method = "adam"
 
