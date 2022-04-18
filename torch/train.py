@@ -275,12 +275,12 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test):
 
 if __name__ == "__main__":
     # Training Process
-    N_train = 500 #5000
+    N_train = 5000 #5000
     N_test = 1000
         
     layers = 3
 
-    nIter = 100 #2000  # original niter is 200000
+    nIter = 200000  # original niter is 200000
 
     lr = 0.001
 
