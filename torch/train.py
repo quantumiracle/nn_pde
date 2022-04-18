@@ -11,24 +11,21 @@ import time, math
 # from mpl_toolkits.axes_grid1 import make_axes_locatable
 # import matplotlib.gridspec as gridspec
 # from matplotlib import rc
-from IPython.display import clear_output
-import matplotlib.pyplot as plt
-
-np.random.seed(123)
-torch.manual_seed(100)
-
-print(torch.__version__)
-
-
-# Model
 import torch.nn as nn
 from torch.autograd import grad
 from torch.autograd import backward
 import torch.nn.functional as F
+from IPython.display import clear_output
+import matplotlib.pyplot as plt
+from torch.utils.tensorboard import SummaryWriter
 
+np.random.seed(123)
+torch.manual_seed(100)
 
 # device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 device = 'cpu'
+writer = SummaryWriter()
+
 
 class PhysicsInformedNN(nn.Module):
     def __init__(self, xyt, u, v, layers, optim_method, lr): # xyt.size()=(N*T,3), Xbatch=N*T
@@ -53,8 +50,7 @@ class PhysicsInformedNN(nn.Module):
         self.input_layer =  nn.Linear(self.input_dim, self.hidden_dim)
         self.hidden_layers = [nn.Linear(self.hidden_dim, self.hidden_dim) for _ in range(self.layers)]
         self.ouput_layer = nn.Linear(self.hidden_dim, self.output_dim)
-        # for p in self.parameters():
-        #     print(p.data)
+
         self.apply(self._weight_init)
 
         if optim_method == "adam":
@@ -224,60 +220,7 @@ def plot(x):
     plt.savefig('nn.png')
     # plt.show()
 
-
-# Training
-def train(pinn, nIter): 
-    losses = []
-    start_time = time.time()
-    for it in range(nIter):
-        loss_value = pinn.loss_function()
-        pinn.optim.zero_grad()
-        loss_value.backward()
-        pinn.optim.step()
-        lambda_1_value = pinn.lambda_1
-        lambda_2_value = pinn.lambda_2
-        losses.append(loss_value.item())
-        if it % 100 == 0:
-            elapsed = time.time() - start_time
-            print('It: %d, Loss: %.3e, l1: %.3f, l2: %.5f, Time: %.2f' % 
-                  (it, loss_value, lambda_1_value, lambda_2_value, elapsed))
-            start_time = time.time()
-            plot(losses)
-
-
-if __name__ == "__main__":
-    # Training Process
-    N_train = 500 #5000
-    N_test = 1000
-        
-    layers = 3
-
-    nIter = 10000 #2000  # original niter is 200000
-
-    lr = 0.001
-
-    optim_method = "adam"
-
-    xyt, u, v, p, N, T = load_data()
-
-    # Training Data    
-    idx = np.random.choice(N*T, N_train, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
-    xyt_train = xyt[idx,:]
-    u_train = u[idx,:]
-    v_train = v[idx,:]
-
-    # Training
-    pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, optim_method, lr).to(device) 
-    train(pinn, nIter)
-
-    # Test Data
-    idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
-    xyt_test = xyt[idx,:]
-    u_test = u[idx,:]
-    v_test = v[idx,:]
-    p_test = p[idx,:]
-
-    # Prediction
+def eval(pinn, xyt_test, u_test, v_test, p_test, verbose=False):
     u_pred, v_pred, p_pred = pinn(xyt_test)[0:3]
     lambda_1_value = pinn.lambda_1.detach().cpu().numpy()
     lambda_2_value = pinn.lambda_2.detach().cpu().numpy()
@@ -294,8 +237,73 @@ if __name__ == "__main__":
     error_lambda_1 = np.abs(lambda_1_value - 1.0)*100
     error_lambda_2 = np.abs(lambda_2_value - 0.01)/0.01 * 100
 
-    print('Error u: %e' % (error_u))    
-    print('Error v: %e' % (error_v))    
-    print('Error p: %e' % (error_p))    
-    print('Error l1: %.5f%%' % (error_lambda_1))                             
-    print('Error l2: %.5f%%' % (error_lambda_2))           
+    if verbose:
+        print('Error u: %e' % (error_u))    
+        print('Error v: %e' % (error_v))    
+        print('Error p: %e' % (error_p))    
+        print('Error l1: %.5f%%' % (error_lambda_1))                             
+        print('Error l2: %.5f%%' % (error_lambda_2)) 
+
+    return error_u, error_v, error_p, error_lambda_1, error_lambda_2   
+
+# Training
+def train(pinn, nIter, xyt_test, u_test, v_test, p_test): 
+    losses = []
+    start_time = time.time()
+    for it in range(nIter):
+        loss_train = pinn.loss_function()
+        pinn.optim.zero_grad()
+        loss_train.backward()
+        pinn.optim.step()
+        lambda_1_value = pinn.lambda_1
+        lambda_2_value = pinn.lambda_2
+        losses.append(loss_train.item())
+        if it % 10 == 0:
+            elapsed = time.time() - start_time
+            print('It: %d, Loss: %.3e, l1: %.3f, l2: %.5f, Time: %.2f' % 
+                  (it, loss_train, lambda_1_value, lambda_2_value, elapsed))
+            start_time = time.time()
+            # plot(losses)
+            error_u, error_v, error_p, error_lambda_1, error_lambda_2 = eval(pinn, xyt_test, u_test, v_test, p_test)
+            writer.add_scalar('Train/Loss', loss_train, it)
+            writer.add_scalar('Test Error/u', error_u, it)
+            writer.add_scalar('Test Error/v', error_v, it)
+            writer.add_scalar('Test Error/p', error_p, it)
+            writer.add_scalar('Test Error/lambda1', error_lambda_1, it)
+            writer.add_scalar('Test Error/lambda2', error_lambda_2, it)
+
+
+if __name__ == "__main__":
+    # Training Process
+    N_train = 500 #5000
+    N_test = 1000
+        
+    layers = 3
+
+    nIter = 100 #2000  # original niter is 200000
+
+    lr = 0.001
+
+    optim_method = "adam"
+
+    xyt, u, v, p, N, T = load_data()
+
+    # Training Data    
+    idx = np.random.choice(N*T, N_train, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
+    xyt_train = xyt[idx,:]
+    u_train = u[idx,:]
+    v_train = v[idx,:]
+
+    # Test Data
+    idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
+    xyt_test = xyt[idx,:]
+    u_test = u[idx,:]
+    v_test = v[idx,:]
+    p_test = p[idx,:]
+
+    # Training
+    pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, optim_method, lr).to(device) 
+    train(pinn, nIter, xyt_test, u_test, v_test, p_test)
+
+    # Prediction
+    eval(pinn, xyt_test, u_test, v_test, p_test, verbose=True)
