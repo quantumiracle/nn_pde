@@ -28,7 +28,7 @@ writer = SummaryWriter()
 
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, xyt, u, v, layers, optim_method, lr): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, xyt, u, v, layers, optim_method, lr, lmbda=0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.xyt = xyt
         self.u = u
@@ -53,6 +53,7 @@ class PhysicsInformedNN(nn.Module):
 
         self.apply(self._weight_init)
 
+
         if optim_method == "adam":
             self.optim = torch.optim.Adam(self.parameters(), lr=lr)
         elif optim_method == "sgd":
@@ -60,6 +61,7 @@ class PhysicsInformedNN(nn.Module):
         else:
             print("THIS OPTIMIZATION METHOD IS NOT SUPPORTED.")
             return 0
+        self.scheduler = torch.optim.lr_scheduler.MultiplicativeLR(self.optim, lr_lambda=lmbda)
 
     # def initialize_NN(self, layers):
     #     weights = []
@@ -258,6 +260,8 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test):
         lambda_1_value = pinn.lambda_1
         lambda_2_value = pinn.lambda_2
         losses.append(loss_train.item())
+        if (it+1)%10000 == 0:
+            pinn.scheduler.step()
         if it % 100 == 0:
             elapsed = time.time() - start_time
             print('It: %d, Loss: %.3e, l1: %.3f, l2: %.5f, Time: %.2f' % 
