@@ -297,9 +297,9 @@ if __name__ == "__main__":
     # Test Data
     idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
     xyt_test = xyt[idx,:]
-    u_test = u[idx,:]
-    v_test = v[idx,:]
-    p_test = p[idx,:]
+    u_test = u[idx,:].cpu().numpy()
+    v_test = v[idx,:].cpu().numpy()
+    p_test = p[idx,:].cpu().numpy()
 
     # Training
     pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, optim_method, lr).to(device) 
