@@ -22,13 +22,13 @@ from torch.utils.tensorboard import SummaryWriter
 np.random.seed(123)
 torch.manual_seed(100)
 
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-# device = 'cpu'
+# device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 writer = SummaryWriter()
 
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, xyt, u, v, layers, optim_method, lr, lmbda=0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, xyt, u, v, layers, optim_method, lr, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.xyt = xyt
         self.u = u
@@ -262,6 +262,8 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test):
         losses.append(loss_train.item())
         if (it+1)%10000 == 0:
             pinn.scheduler.step()
+            # for param_group in pinn.optim.param_groups:
+            #     print(param_group['lr'])
         if it % 100 == 0:
             elapsed = time.time() - start_time
             print('It: %d, Loss: %.3e, l1: %.3f, l2: %.5f, Time: %.2f' % 
