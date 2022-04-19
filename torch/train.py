@@ -1,3 +1,4 @@
+from pyexpat import model
 import torch
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -18,6 +19,8 @@ import torch.nn.functional as F
 from IPython.display import clear_output
 import matplotlib.pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
+import argparse
+parser = argparse.ArgumentParser(description='Arguments.')
 
 np.random.seed(123)
 torch.manual_seed(100)
@@ -28,7 +31,7 @@ writer = SummaryWriter()
 
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, xyt, u, v, layers, optim_method, lr, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, xyt, u, v, layers, optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.xyt = xyt
         self.u = u
@@ -40,7 +43,7 @@ class PhysicsInformedNN(nn.Module):
         self.layers = layers
         self.input_dim = 3
         self.output_dim = 2
-        self.hidden_dim = 64
+        self.hidden_dim = 20
         self.hidden_activation = F.tanh  # relu does not work
         
         # Initialize parameters
@@ -181,10 +184,26 @@ class PhysicsInformedNN(nn.Module):
     def loss_function(self):
         u, v, p, f_u, f_v = self.forward(self.xyt)
 
-        return  (self.u.squeeze() - u).pow(2).sum()+\
-                (self.v.squeeze() - v).pow(2).sum()+\
-                f_u.pow(2).sum()+\
-                f_v.pow(2).sum()
+        u_loss = (self.u.squeeze() - u).pow(2).mean()
+        v_loss = (self.v.squeeze() - v).pow(2).mean()
+        f_u_loss = f_u.pow(2).mean()
+        f_v_loss = f_v.pow(2).mean()
+
+        loss = u_loss + v_loss + f_u_loss + f_v_loss
+
+        return loss, u_loss, v_loss
+
+        # return  (self.u.squeeze() - u).pow(2).sum()+\
+        #         (self.v.squeeze() - v).pow(2).sum()+\
+        #         f_u.pow(2).sum()+\
+        #         f_v.pow(2).sum()
+
+
+    def load_model(self, path):
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        if self.dynamics_model:
+            self.dynamics_model.load_state_dict(torch.load(path+'dynamics', map_location=device))
+            self.dynamics_model.eval()
 
 def load_data():
     # Data loading and processing
@@ -232,9 +251,12 @@ def eval(pinn, xyt_test, u_test, v_test, p_test, verbose=False):
     p_pred = p_pred.detach().cpu().numpy()
 
     # Error
-    error_u = np.linalg.norm(u_test-u_pred,2)/np.linalg.norm(u_test,2)
-    error_v = np.linalg.norm(v_test-v_pred,2)/np.linalg.norm(v_test,2)
-    error_p = np.linalg.norm(p_test-p_pred,2)/np.linalg.norm(p_test,2)
+    # error_u = np.linalg.norm(u_test-u_pred,2)/np.linalg.norm(u_test,2)
+    # error_v = np.linalg.norm(v_test-v_pred,2)/np.linalg.norm(v_test,2)
+    # error_p = np.linalg.norm(p_test-p_pred,2)/np.linalg.norm(p_test,2)
+    error_u = ((u_test-u_pred)**2).mean()
+    error_v = ((v_test-v_pred)**2).mean()
+    error_p = ((p_test-p_pred)**2).mean()
 
     error_lambda_1 = np.abs(lambda_1_value - 1.0)*100
     error_lambda_2 = np.abs(lambda_2_value - 0.01)/0.01 * 100
@@ -249,11 +271,12 @@ def eval(pinn, xyt_test, u_test, v_test, p_test, verbose=False):
     return error_u, error_v, error_p, error_lambda_1, error_lambda_2   
 
 # Training
-def train(pinn, nIter, xyt_test, u_test, v_test, p_test): 
+def train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path): 
     losses = []
     start_time = time.time()
+    adapt_lr = pinn.optim.param_groups[0]['lr']
     for it in range(nIter):
-        loss_train = pinn.loss_function()
+        loss_train, u_loss, v_loss = pinn.loss_function()
         pinn.optim.zero_grad()
         loss_train.backward()
         pinn.optim.step()
@@ -262,16 +285,22 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test):
         losses.append(loss_train.item())
         if (it+1)%10000 == 0:
             pinn.scheduler.step()
+            adapt_lr = pinn.optim.param_groups[0]['lr']
             # for param_group in pinn.optim.param_groups:
             #     print(param_group['lr'])
+            torch.save(pinn.state_dict(), model_path)
+
         if it % 100 == 0:
             elapsed = time.time() - start_time
-            print('It: %d, Loss: %.3e, l1: %.3f, l2: %.5f, Time: %.2f' % 
+            print('It: %d, Loss: %.3e, lamd1: %.3f, lamd2: %.5f, Time: %.2f' % 
                   (it, loss_train, lambda_1_value, lambda_2_value, elapsed))
             start_time = time.time()
             # plot(losses)
             error_u, error_v, error_p, error_lambda_1, error_lambda_2 = eval(pinn, xyt_test, u_test, v_test, p_test)
             writer.add_scalar('Train/Loss', loss_train, it)
+            writer.add_scalars('Train/compare_u', {'train': u_loss, 'test': error_u}, it)
+            writer.add_scalars('Train/compare_v', {'train': v_loss, 'test': error_v}, it)
+            writer.add_scalar('Train/LR', adapt_lr, it)
             writer.add_scalar('Test Error/u', error_u, it)
             writer.add_scalar('Test Error/v', error_v, it)
             writer.add_scalar('Test Error/p', error_p, it)
@@ -280,17 +309,23 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test):
 
 
 if __name__ == "__main__":
+    parser.add_argument('--id', type=str, default=None, help='environment')
+    args = parser.parse_args()
+
     # Training Process
     N_train = 5000 #5000
     N_test = 1000
         
-    layers = 3
+    layers = 8
 
     nIter = 200000  # original niter is 200000
 
     lr = 0.01
 
     optim_method = "adam"
+    model_path = './model/'
+    postfix = args.id if args.id is not None else '0'
+    model_path += postfix
 
     xyt, u, v, p, N, T = load_data()
 
@@ -299,6 +334,7 @@ if __name__ == "__main__":
     xyt_train = xyt[idx,:]
     u_train = u[idx,:]
     v_train = v[idx,:]
+    print(xyt.shape, u.shape, v.shape)
 
     # Test Data
     idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
@@ -309,7 +345,7 @@ if __name__ == "__main__":
 
     # Training
     pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, optim_method, lr).to(device) 
-    train(pinn, nIter, xyt_test, u_test, v_test, p_test)
+    train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
     eval(pinn, xyt_test, u_test, v_test, p_test, verbose=True)
