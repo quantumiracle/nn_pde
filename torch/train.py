@@ -284,7 +284,7 @@ if __name__ == "__main__":
     N_train = 5000 #5000
     N_test = 1000
         
-    layers = 6
+    layers = 3
 
     nIter = 200000  # original niter is 200000
 
