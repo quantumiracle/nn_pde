@@ -1,17 +1,8 @@
 from pyexpat import model
 import torch
 import numpy as np
-# import matplotlib.pyplot as plt
 import scipy.io
-# from scipy.interpolate import griddata
 import time, math
-# from itertools import product, combinations
-# from mpl_toolkits.mplot3d import Axes3D
-# from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-# # from plotting import newfig, savefig
-# from mpl_toolkits.axes_grid1 import make_axes_locatable
-# import matplotlib.gridspec as gridspec
-# from matplotlib import rc
 import torch.nn as nn
 from torch.autograd import grad
 from torch.autograd import backward
@@ -52,6 +43,7 @@ class PhysicsInformedNN(nn.Module):
 
         self.input_layer =  nn.Linear(self.input_dim, self.hidden_dim).to(device)
         self.hidden_layers = [nn.Linear(self.hidden_dim, self.hidden_dim).to(device) for _ in range(self.layers)]
+        self.hidden_layers = nn.ModuleList(self.hidden_layers)  # Have to wrap the list layers with nn.ModuleList to coorectly make those parameters tracked by nn.module! Otherwise those params will not be saved!
         self.ouput_layer = nn.Linear(self.hidden_dim, self.output_dim).to(device)
 
         self.apply(self._weight_init)
@@ -324,7 +316,7 @@ if __name__ == "__main__":
 
     optim_method = "adam"
     model_path = './model/'
-    postfix = args.id if args.id is not None else '0'
+    postfix = args.id if args.id is not None else '1'
     model_path += postfix
 
     xyt, u, v, p, N, T = load_data()
