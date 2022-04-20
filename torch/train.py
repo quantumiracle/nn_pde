@@ -16,13 +16,11 @@ parser = argparse.ArgumentParser(description='Arguments.')
 np.random.seed(123)
 torch.manual_seed(100)
 
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-# device = 'cpu'
 writer = SummaryWriter()
 
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, xyt, u, v, layers, optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, xyt, u, v, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.xyt = xyt
         self.u = u
@@ -191,13 +189,7 @@ class PhysicsInformedNN(nn.Module):
         #         f_v.pow(2).sum()
 
 
-    def load_model(self, path):
-        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-        if self.dynamics_model:
-            self.dynamics_model.load_state_dict(torch.load(path+'dynamics', map_location=device))
-            self.dynamics_model.eval()
-
-def load_data():
+def load_data(device):
     # Data loading and processing
     data = scipy.io.loadmat('./data/cylinder_nektar_wake.mat')
 
@@ -301,6 +293,9 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path):
 
 
 if __name__ == "__main__":
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
+
     parser.add_argument('--id', type=str, default=None, help='environment')
     args = parser.parse_args()
 
@@ -316,10 +311,10 @@ if __name__ == "__main__":
 
     optim_method = "adam"
     model_path = './model/'
-    postfix = args.id if args.id is not None else '1'
+    postfix = args.id if args.id is not None else '0'
     model_path += postfix
 
-    xyt, u, v, p, N, T = load_data()
+    xyt, u, v, p, N, T = load_data(device)
 
     # Training Data    
     idx = np.random.choice(N*T, N_train, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
@@ -336,7 +331,7 @@ if __name__ == "__main__":
     p_test = p[idx,:].cpu().numpy()
 
     # Training
-    pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, optim_method, lr).to(device) 
+    pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, device, optim_method, lr).to(device) 
     train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
