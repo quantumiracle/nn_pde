@@ -16,9 +16,6 @@ parser = argparse.ArgumentParser(description='Arguments.')
 np.random.seed(123)
 torch.manual_seed(100)
 
-writer = SummaryWriter()
-
-
 class PhysicsInformedNN(nn.Module):
     def __init__(self, xyt, u, v, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
@@ -296,11 +293,13 @@ if __name__ == "__main__":
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     # device = 'cpu'
 
-    parser.add_argument('--id', type=str, default=None, help='environment')
+    parser.add_argument('--id', type=str, default=None)
+    parser.add_argument('--data', type=int, default=5000)
     args = parser.parse_args()
+    writer = SummaryWriter(args.id+args.data)
 
     # Training Process
-    N_train = 50000 #5000
+    N_train = int(args.data) #5000
     N_test = 1000
         
     layers = 8
