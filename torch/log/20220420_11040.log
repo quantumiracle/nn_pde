@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "train.py", line 299, in <module>
+    writer = SummaryWriter(args.id+args.data)
+TypeError: can only concatenate str (not "int") to str
