@@ -29,7 +29,7 @@ class PhysicsInformedNN(nn.Module):
         self.layers = layers
         self.input_dim = 3
         self.output_dim = 2
-        self.hidden_dim = 20
+        self.hidden_dim = 64
         self.hidden_activation = F.tanh  # relu does not work
         
         # Initialize parameters
@@ -325,14 +325,14 @@ if __name__ == "__main__":
     xyt_train = xyt[idx,:]
     u_train = u[idx,:]
     v_train = v[idx,:]
-    print(xyt.shape, u.shape, v.shape)
+    # print(xyt.shape, u.shape, v.shape)
 
     # Test Data
-    idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
-    xyt_test = xyt[idx,:]
-    u_test = u[idx,:].cpu().numpy()
-    v_test = v[idx,:].cpu().numpy()
-    p_test = p[idx,:].cpu().numpy()
+    test_idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
+    xyt_test = xyt[test_idx,:]
+    u_test = u[test_idx,:].cpu().numpy()
+    v_test = v[test_idx,:].cpu().numpy()
+    p_test = p[test_idx,:].cpu().numpy()
 
     # Training
     pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, device, optim_method, lr).to(device) 
