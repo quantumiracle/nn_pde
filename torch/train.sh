@@ -8,7 +8,7 @@ echo "Save as: " $DATE
 
 declare -a data=('5000' '10000' '20000' '30000' '40000' '50000')
 
-for i in ${!data[@]}; do
+for i in ${data[@]}; do
     echo $i
-    nohup python train.py --id $DATE --data ${data[$i]} > log/$DATE$i.log &
+    nohup python train.py --id $DATE --data $i > log/$DATE$i.log &
 done 

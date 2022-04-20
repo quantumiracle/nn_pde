@@ -296,7 +296,7 @@ if __name__ == "__main__":
     parser.add_argument('--id', type=str, default=None)
     parser.add_argument('--data', type=int, default=5000)
     args = parser.parse_args()
-    writer = SummaryWriter(args.id+args.data)
+    writer = SummaryWriter(args.id+str(args.data))
 
     # Training Process
     N_train = int(args.data) #5000
