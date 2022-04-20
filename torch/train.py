@@ -230,6 +230,9 @@ def eval(pinn, xyt_test, u_test, v_test, p_test, verbose=False):
     u_pred = u_pred.detach().cpu().numpy()
     v_pred = v_pred.detach().cpu().numpy()
     p_pred = p_pred.detach().cpu().numpy()
+    u_test = np.squeeze(u_test)
+    v_test = np.squeeze(v_test)
+    p_test = np.squeeze(p_test)
 
     # Error
     # error_u = np.linalg.norm(u_test-u_pred,2)/np.linalg.norm(u_test,2)
@@ -279,8 +282,10 @@ def train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path):
             # plot(losses)
             error_u, error_v, error_p, error_lambda_1, error_lambda_2 = eval(pinn, xyt_test, u_test, v_test, p_test)
             writer.add_scalar('Train/Loss', loss_train, it)
-            writer.add_scalars('Train/compare_u', {'train': u_loss, 'test': error_u}, it)
-            writer.add_scalars('Train/compare_v', {'train': v_loss, 'test': error_v}, it)
+            # writer.add_scalars('Train/compare_u', {'train': u_loss, 'test': error_u}, it) # this mess up the runs folder
+            # writer.add_scalars('Train/compare_v', {'train': v_loss, 'test': error_v}, it)
+            writer.add_scalar('Train/u', u_loss, it)
+            writer.add_scalar('Train/v', v_loss, it)
             writer.add_scalar('Train/LR', adapt_lr, it)
             writer.add_scalar('Test Error/u', error_u, it)
             writer.add_scalar('Test Error/v', error_v, it)
@@ -293,10 +298,10 @@ if __name__ == "__main__":
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     # device = 'cpu'
 
-    parser.add_argument('--id', type=str, default=None)
+    parser.add_argument('--id', type=str, default='')
     parser.add_argument('--data', type=int, default=5000)
     args = parser.parse_args()
-    writer = SummaryWriter(args.id+str(args.data))
+    writer = SummaryWriter('runs/'+args.id+str(args.data))
 
     # Training Process
     N_train = int(args.data) #5000
