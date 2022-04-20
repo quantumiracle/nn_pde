@@ -300,7 +300,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Training Process
-    N_train = 5000 #5000
+    N_train = 50000 #5000
     N_test = 1000
         
     layers = 8
