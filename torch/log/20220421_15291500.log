@@ -1,0 +1,14 @@
+/home/zihan/anaconda3/envs/x/lib/python3.7/site-packages/torch/nn/functional.py:1933: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+Traceback (most recent call last):
+  File "train.py", line 341, in <module>
+    train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path)
+  File "train.py", line 265, in train
+    loss_train, u_loss, v_loss = pinn.loss_function()
+  File "train.py", line 174, in loss_function
+    u, v, p, f_u, f_v = self.forward(self.xyt)
+  File "train.py", line 171, in forward
+    return self.net_NS(xyt)
+  File "train.py", line 165, in net_NS
+    f_u = u_t + self.lambda_1*(u*u_x + v*u_y) + p_x - self.lambda_2*(u_xx + u_yy) 
+RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!
