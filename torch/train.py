@@ -35,8 +35,8 @@ class PhysicsInformedNN(nn.Module):
         # Initialize parameters
         # self.lambda_1 = nn.Parameter(torch.zeros(1, dtype=torch.float64), requires_grad=True)
         # self.lambda_2 = nn.Parameter(torch.zeros(1, dtype=torch.float64), requires_grad=True)
-        self.lambda_1 = torch.Tensor([1.])
-        self.lambda_2 = torch.Tensor([0.01])
+        self.lambda_1 = torch.Tensor([1.]).to(device)
+        self.lambda_2 = torch.Tensor([0.01]).to(device)
 
         self.input_layer =  nn.Linear(self.input_dim, self.hidden_dim).to(device)
         self.hidden_layers = [nn.Linear(self.hidden_dim, self.hidden_dim).to(device) for _ in range(self.layers)]
