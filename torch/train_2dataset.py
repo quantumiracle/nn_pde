@@ -291,7 +291,6 @@ if __name__ == "__main__":
     N_total = N*T
     N_train = int(args.data) # 1000 number of datapoints, not collocation points
     N_test = 1000
-    N_train = N_total - N_test
 
     # Test data
     test_idx = np.random.choice(N_total, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
