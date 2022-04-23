@@ -17,15 +17,9 @@ np.random.seed(123)
 torch.manual_seed(100)
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, data_idx, xyt, u, v, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.data_idx = data_idx
-        self.xyt = xyt
-        self.u = u
-        self.v = v
-        
-        self.lb = xyt.min()
-        self.ub = xyt.max()
 
         self.layers = layers
         self.input_dim = 3
@@ -138,13 +132,17 @@ class PhysicsInformedNN(nn.Module):
         return u, v, p, f_u, f_v
         
     def forward(self, xyt):
+        self.lb = xyt.min()
+        self.ub = xyt.max()
         return self.net_NS(xyt)
     
-    def loss_function(self):
-        u, v, p, f_u, f_v = self.forward(self.xyt)
+    def loss_function(self, xyt, xyt_, u_label, v_label):
+        labeled_data_number = xyt_.shape[0]
+        xyt = torch.cat([xyt, xyt_], dim=0)
+        u, v, p, f_u, f_v = self.forward(xyt)
 
-        u_loss = (self.u.squeeze() - u[self.data_idx]).pow(2).mean()
-        v_loss = (self.v.squeeze() - v[self.data_idx]).pow(2).mean()
+        u_loss = (u_label.squeeze() - u[-labeled_data_number:]).pow(2).mean()
+        v_loss = (v_label.squeeze() - v[-labeled_data_number:]).pow(2).mean()
         f_u_loss = f_u.pow(2).mean()
         f_v_loss = f_v.pow(2).mean()
 
@@ -227,12 +225,14 @@ def eval(pinn, xyt_test, u_test, v_test, p_test, verbose=False):
     return error_u, error_v, error_p, error_lambda_1, error_lambda_2   
 
 # Training
-def train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path): 
+def train(pinn, nIter, batch, xyt_train, xyt_data, u_data, v_data, xyt_test, u_test, v_test, p_test, model_path): 
     losses = []
     start_time = time.time()
     adapt_lr = pinn.optim.param_groups[0]['lr']
     for it in range(nIter):
-        loss_train, u_loss, v_loss = pinn.loss_function()
+        sample_idx = np.random.choice(xyt_train.shape[0], batch, replace=False)# cannot forward the whole dataset, sample a batch containing data points
+        xyt = xyt_train[sample_idx]
+        loss_train, u_loss, v_loss = pinn.loss_function(xyt, xyt_data, u_data, v_data)
         pinn.optim.zero_grad()
         loss_train.backward()
         pinn.optim.step()
@@ -277,10 +277,9 @@ if __name__ == "__main__":
 
     # Training Process
     layers = 8
-
     nIter = 200000  # original niter is 200000
-
     lr = 0.01
+    batch = 10000
 
     optim_method = "adam"
     model_path = './model/'
@@ -313,8 +312,8 @@ if __name__ == "__main__":
     print(f"Total samples in dataset: {N_total}, collocation points: {len(train_idx)}, data poinst: {len(data_idx)}, test points: {len(test_idx)}")
 
     # Training
-    pinn = PhysicsInformedNN(data_idx, xyt_train, u_data, v_data, layers, device, optim_method, lr).to(device) 
-    train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path)
+    pinn = PhysicsInformedNN(layers, device, optim_method, lr).to(device) 
+    train(pinn, nIter, batch, xyt_train, xyt_data, u_data, v_data, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
     eval(pinn, xyt_test, u_test, v_test, p_test, verbose=True)
