@@ -17,8 +17,9 @@ np.random.seed(123)
 torch.manual_seed(100)
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, xyt, u, v, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, data_idx, xyt, u, v, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
+        self.data_idx = data_idx
         self.xyt = xyt
         self.u = u
         self.v = v
@@ -142,8 +143,8 @@ class PhysicsInformedNN(nn.Module):
     def loss_function(self):
         u, v, p, f_u, f_v = self.forward(self.xyt)
 
-        u_loss = (self.u.squeeze() - u).pow(2).mean()
-        v_loss = (self.v.squeeze() - v).pow(2).mean()
+        u_loss = (self.u.squeeze() - u[self.data_idx]).pow(2).mean()
+        v_loss = (self.v.squeeze() - v[self.data_idx]).pow(2).mean()
         f_u_loss = f_u.pow(2).mean()
         f_v_loss = f_v.pow(2).mean()
 
@@ -275,9 +276,6 @@ if __name__ == "__main__":
     writer = SummaryWriter('runs/'+args.id+str(args.data))
 
     # Training Process
-    N_train = int(args.data) #5000
-    N_test = 1000
-        
     layers = 8
 
     nIter = 200000  # original niter is 200000
@@ -290,23 +288,32 @@ if __name__ == "__main__":
     model_path += postfix
 
     xyt, u, v, p, N, T = load_data(device)
+    print(xyt.shape)
+    N_total = N*T
+    N_train = int(args.data) # 1000 number of datapoints, not collocation points
+    N_test = 1000
+    N_train = N_total - N_test
 
-    # Training Data    
-    idx = np.random.choice(N*T, N_train, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
-    xyt_train = xyt[idx,:]
-    u_train = u[idx,:]
-    v_train = v[idx,:]
-    # print(xyt.shape, u.shape, v.shape)
-
-    # Test Data
-    test_idx = np.random.choice(N*T, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
+    # Test data
+    test_idx = np.random.choice(N_total, N_test, replace=False) # Generate a random sample from np.arange(N*T) of size N_train without replacement
     xyt_test = xyt[test_idx,:]
     u_test = u[test_idx,:].cpu().numpy()
     v_test = v[test_idx,:].cpu().numpy()
     p_test = p[test_idx,:].cpu().numpy()
 
+    # Training data as the rest from the test data: collocation points
+    train_idx = list(set(np.arange(N_total)) - set(test_idx))
+    xyt_train = xyt[train_idx,:]
+
+
+    data_idx = np.random.choice(train_idx, N_train, replace=False) # data points
+    xyt_data = xyt[data_idx,:]
+    u_data = u[data_idx,:]
+    v_data = v[data_idx,:]
+    print(f"Total samples in dataset: {N_total}, collocation points: {len(train_idx)}, data poinst: {len(data_idx)}, test points: {len(test_idx)}")
+
     # Training
-    pinn = PhysicsInformedNN(xyt_train, u_train, v_train, layers, device, optim_method, lr).to(device) 
+    pinn = PhysicsInformedNN(data_idx, xyt_train, u_data, v_data, layers, device, optim_method, lr).to(device) 
     train(pinn, nIter, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
