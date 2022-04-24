@@ -17,7 +17,7 @@ np.random.seed(123)
 torch.manual_seed(100)
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, xyt, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()
         self.data_idx = data_idx
 
@@ -26,7 +26,10 @@ class PhysicsInformedNN(nn.Module):
         self.output_dim = 2
         self.hidden_dim = 20
         self.hidden_activation = F.tanh  # relu does not work
-        
+
+        self.lb = xyt.min()
+        self.ub = xyt.max()
+
         # Initialize parameters
         # learnable lambda
         # self.lambda_1 = nn.Parameter(torch.zeros(1, dtype=torch.float64), requires_grad=True)
@@ -132,8 +135,6 @@ class PhysicsInformedNN(nn.Module):
         return u, v, p, f_u, f_v
         
     def forward(self, xyt):
-        self.lb = xyt.min()
-        self.ub = xyt.max()
         return self.net_NS(xyt)
     
     def loss_function(self, xyt, xyt_, u_label, v_label):
@@ -311,7 +312,7 @@ if __name__ == "__main__":
     print(f"Total samples in dataset: {N_total}, collocation points: {len(train_idx)}, data poinst: {len(data_idx)}, test points: {len(test_idx)}")
 
     # Training
-    pinn = PhysicsInformedNN(layers, device, optim_method, lr).to(device) 
+    pinn = PhysicsInformedNN(layers, xyt_data, device, optim_method, lr).to(device) 
     train(pinn, nIter, batch, xyt_train, xyt_data, u_data, v_data, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
