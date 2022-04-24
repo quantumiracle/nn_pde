@@ -7,7 +7,7 @@ echo "Save as: " $DATE
 # nohup python train.py --id $DATE > log/$DATE$RAND.log &
 
 # declare -a data=('500' '1000' '1500' '2000' '5000')
-declare -a data=('1000')
+declare -a data=('100' '300' '500' '700')
 
 for i in ${data[@]}; do
     echo $i
