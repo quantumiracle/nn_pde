@@ -312,7 +312,7 @@ if __name__ == "__main__":
     print(f"Total samples in dataset: {N_total}, collocation points: {len(train_idx)}, data poinst: {len(data_idx)}, test points: {len(test_idx)}")
 
     # Training
-    pinn = PhysicsInformedNN(layers, xyt_data, device, optim_method, lr).to(device) 
+    pinn = PhysicsInformedNN(xyt_data, layers, device, optim_method, lr).to(device) 
     train(pinn, nIter, batch, xyt_train, xyt_data, u_data, v_data, xyt_test, u_test, v_test, p_test, model_path)
 
     # Prediction
