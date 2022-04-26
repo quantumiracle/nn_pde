@@ -100,10 +100,10 @@ class PhysicsInformedNN(nn.Module):
         return self.net_NS(xt)
     
     def loss_function(self, collc_xt, data_xt, data_z):
-        data_u, _ = self.forward(data_xt)
+        pred_u, _ = self.forward(data_xt)
         _, f_u = self.forward(collc_xt)
 
-        u_loss = (data_u.squeeze() - data_z).pow(2).mean()
+        u_loss = (pred_u.squeeze() - data_z).pow(2).mean()
         f_u_loss = f_u.pow(2).mean()
 
         loss = u_loss + f_u_loss
@@ -136,7 +136,7 @@ def eval(pinn, test_xt, test_z, verbose=False):
     u_pred, _ = pinn(test_xt)
     nu_value = pinn.nu.detach().cpu().numpy()
 
-    u_pred = u_pred.detach().cpu().numpy()
+    u_pred = u_pred.squeeze().detach().cpu().numpy()
     
     # Error
     # error_u = np.linalg.norm(u_test-u_pred,2)/np.linalg.norm(u_test,2)
@@ -185,8 +185,8 @@ def train(pinn, nIter, batch, collc_xt, collc_z, data_xt, data_z, test_xt, test_
 
 
 if __name__ == "__main__":
-    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    # device = 'cpu'
+    # device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
 
     parser.add_argument('--id', type=str, default='')
     parser.add_argument('--data', type=int, default=5000)
