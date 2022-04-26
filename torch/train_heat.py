@@ -185,8 +185,8 @@ def train(pinn, nIter, batch, collc_xt, collc_z, data_xt, data_z, test_xt, test_
 
 
 if __name__ == "__main__":
-    # device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    device = 'cpu'
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
 
     parser.add_argument('--id', type=str, default='')
     parser.add_argument('--data', type=int, default=5000)
