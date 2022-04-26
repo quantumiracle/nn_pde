@@ -11,5 +11,5 @@ declare -a data=('5000' '10000')
 
 for i in ${data[@]}; do
     echo $i
-    nohup python train.py --id $DATE --data $i > log/$DATE$i.log &
+    nohup python train_NS.py --id $DATE --data $i > log/$DATE$i.log &
 done 

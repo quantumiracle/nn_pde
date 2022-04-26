@@ -11,5 +11,5 @@ declare -a data=('100' '300' '500' '700')
 
 for i in ${data[@]}; do
     echo $i
-    nohup python train_2dataset.py --id $DATE --data $i > log/2data_$DATE$i.log &
+    nohup python train_NS_2dataset.py --id $DATE --data $i > log/2data_$DATE$i.log &
 done 
