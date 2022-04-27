@@ -25,7 +25,7 @@ class PhysicsInformedNN(nn.Module):
         self.layers = layers
         self.input_dim = 2
         self.output_dim = 1
-        self.hidden_dim = 64
+        self.hidden_dim = 512
         self.hidden_activation = F.tanh  # relu does not work
         
         # Initialize parameters
