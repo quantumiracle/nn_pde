@@ -17,7 +17,7 @@ np.random.seed(123)
 torch.manual_seed(100)
 
 class PhysicsInformedNN(nn.Module):
-    def __init__(self, data_xt, data_z, layers, device='cpu', optim_method='adam', lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
+    def __init__(self, data_xt, data_z, layers, device='cpu', optim_method='adam', hidden_dim=20, lr=0.01, lmbda=lambda epoch: 0.5): # xyt.size()=(N*T,3), Xbatch=N*T
         super(PhysicsInformedNN, self).__init__()    
         self.lb = data_xt.min()
         self.ub = data_xt.max()
@@ -25,7 +25,7 @@ class PhysicsInformedNN(nn.Module):
         self.layers = layers
         self.input_dim = 2
         self.output_dim = 1
-        self.hidden_dim = 20
+        self.hidden_dim = hidden_dim
         self.hidden_activation = F.tanh  # relu does not work
         
         # Initialize parameters
@@ -190,6 +190,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--id', type=str, default='')
     parser.add_argument('--data', type=int, default=5000)
+    parser.add_argument('--dim', type=int, default=20)
     args = parser.parse_args()
     writer = SummaryWriter('runs/'+args.id+str(args.data))
 
@@ -201,6 +202,7 @@ if __name__ == "__main__":
     nIter = 50000  # original niter is 200000
     lr = 0.001
     batch = 10000
+    hidden_dim = int(args.dim)
 
     optim_method = "adam"
     model_path = './model/'
@@ -214,7 +216,7 @@ if __name__ == "__main__":
     test_z = test_z[:N_test]
 
     # Training
-    pinn = PhysicsInformedNN(data_xt, data_z, layers, device, optim_method, lr).to(device) 
+    pinn = PhysicsInformedNN(data_xt, data_z, layers, device, optim_method, hidden_dim, lr).to(device) 
     train(pinn, nIter, batch, collc_xt, collc_z, data_xt, data_z, test_xt, test_z, model_path)
 
     # Prediction

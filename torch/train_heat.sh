@@ -6,10 +6,14 @@ echo "Save as: " $DATE
 
 # nohup python train.py --id $DATE > log/$DATE$RAND.log &
 
-declare -a data=('100')
+declare -a data=('10')
+declare -a dim=('32' '64' '128' '256' '512')
+
 # declare -a data=('100' '300' '500' '700' '900')
 
 for i in ${data[@]}; do
-    echo $i
-    nohup python train_heat.py --id $DATE --data $i > log/$DATE$i.log &
+    for j in ${dim[@]}; do
+        echo $i $j
+        nohup python train_heat.py --id $DATE --data $i --dim $j > log/$DATE$i$j.log &
+    done
 done 
