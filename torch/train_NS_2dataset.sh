@@ -7,9 +7,12 @@ echo "Save as: " $DATE
 # nohup python train.py --id $DATE > log/$DATE$RAND.log &
 
 # declare -a data=('500' '1000' '1500' '2000' '5000')
-declare -a data=('100' '300' '500' '700')
+declare -a data=('500')
+declare -a dim=('32' '64' '128' '256' '512')
 
 for i in ${data[@]}; do
-    echo $i
-    nohup python train_NS_2dataset.py --id $DATE --data $i > log/2data_$DATE$i.log &
+    for j in ${dim[@]}; do
+        echo $i $j
+        nohup python train_NS_2dataset.py --id $DATE --data $i --dim $j > log/$DATE$i$j.log &
+    done
 done 
