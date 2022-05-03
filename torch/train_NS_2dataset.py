@@ -278,10 +278,10 @@ if __name__ == "__main__":
     writer = SummaryWriter('runs/'+args.id+str(args.data))
 
     # Training Process
-    layers = 8
+    layers = 4
     nIter = 200000  # original niter is 200000
     lr = 0.01
-    batch = 10000
+    batch = 5000
     hidden_dim = int(args.dim)
 
     optim_method = "adam"
