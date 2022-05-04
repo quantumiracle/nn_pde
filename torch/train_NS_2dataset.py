@@ -278,7 +278,7 @@ if __name__ == "__main__":
     writer = SummaryWriter('runs/'+args.id+str(args.data))
 
     # Training Process
-    layers = 4
+    layers = 2
     nIter = 200000  # original niter is 200000
     lr = 0.01
     batch = 5000
