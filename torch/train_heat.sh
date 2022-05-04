@@ -1,12 +1,12 @@
 echo "Running DATE:" $(date +"%Y-%m-%d %H:%M")
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=1
 
 DATE=`date '+%Y%m%d_%H%M'`
 echo "Save as: " $DATE
 
 # nohup python train.py --id $DATE > log/$DATE$RAND.log &
 
-declare -a data=('10')
+declare -a data=('100')
 declare -a dim=('32' '64' '128' '256' '512')
 
 # declare -a data=('100' '300' '500' '700' '900')
