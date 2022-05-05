@@ -275,7 +275,7 @@ if __name__ == "__main__":
     parser.add_argument('--data', type=int, default=5000)
     parser.add_argument('--dim', type=int, default=20)
     args = parser.parse_args()
-    writer = SummaryWriter('runs/'+args.id+str(args.data))
+    writer = SummaryWriter('runs/'+args.id+'_'+str(args.data)+'_'+str(args.dim))
 
     # Training Process
     layers = 2

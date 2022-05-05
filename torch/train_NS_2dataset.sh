@@ -13,7 +13,7 @@ declare -a dim=('32' '64' '128' '256' '512')
 for i in ${data[@]}; do
     for j in ${dim[@]}; do
         echo $i $j
-        if [ "$j" -gt  128 ]; 
+        if [ "$j" -gt  256 ]; 
         then
         CUDA_VISIBLE_DEVICES=0 nohup python train_NS_2dataset.py --id $DATE --data $i --dim $j > log/$DATE$i$j.log &
         else 
